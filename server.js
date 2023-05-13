@@ -15,7 +15,8 @@ app.get('/', (req, res) => {
         if (error) {
             res.send("An error occured");
         }
-        res.send(JSON.stringify(results));
+        const textResult = results.map(result => result.data).join(', ');
+        res.send(textResult);
     });
 });
 

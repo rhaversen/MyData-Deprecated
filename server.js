@@ -15,14 +15,9 @@ app.get('/', (req, res) => {
         if (error) {
             res.send("An error occured");
         }
-        res.send(results);
-
+        res.send(JSON.stringify(results));
     });
 });
-
-
-
-
 
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);

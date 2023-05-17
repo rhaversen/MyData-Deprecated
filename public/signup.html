@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign Up</title>
+</head>
+<body>
+<h1>Sign Up</h1>
+<form id="signup-form">
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required><br><br>
+
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required><br><br>
+
+  <label for="repeat-password">Repeat Password:</label>
+  <input type="password" id="repeat-password" name="repeat-password" required><br>
+  <small id="password-match-text"></small><br><br>
+
+  <button type="submit">Sign Up</button>
+</form>
+
+<script>
+  document.getElementById("signup-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent the form from submitting immediately
+
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+    var repeatPassword = document.getElementById("repeat-password").value;
+    var passwordMatchText = document.getElementById("password-match-text");
+
+    if (!email || !password || !repeatPassword) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    if (password !== repeatPassword) {
+      passwordMatchText.textContent = "Passwords do not match.";
+      return;
+    }
+
+    // Clear the password match text if passwords match
+    passwordMatchText.textContent = "";
+
+    // Send a POST request to the /signup endpoint
+    fetch('/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: email, password: password }),
+    })
+    .then(response => {
+      // Handle different HTTP response statuses
+      if (response.status === 400) {
+        alert('Invalid request.');
+      } else if (response.status === 409) {
+        alert('Email already in use.');
+      } else if (response.status === 500) {
+        alert('There was a problem registering the user.');
+      } else if (!response.ok) {
+        throw new Error('Network response was not ok.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Handle the response data from the server
+      if (data.auth) {
+        alert('Signup successful!');
+        localStorage.setItem("token", data.token); //Save token
+      } else {
+        alert('Signup failed. Please try again.');
+      }
+    })
+    .catch(error => {
+      // Display any errors that occur during the request
+      alert('An error occurred: ' + error.message);
+    });
+  });
+</script>
+
+</body>
+</html>
